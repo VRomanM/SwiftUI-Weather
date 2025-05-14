@@ -18,7 +18,7 @@ struct RootView: View {
                 CityTextView(cityName: "Cupertino, CA")
                 MainWeatherStatusView(imageName: isNight ? "moon.stars.fill" : "cloud.sun.fill",
                                       temperature: 76)
-                HStack(spacing: 20) {
+                HStack(spacing: 10) {
                     WeatherDayView(dayOfWeek: "TUE", imageName: "cloud.sun.fill", temperature: 10)
                     WeatherDayView(dayOfWeek: "WED", imageName: "sun.max.fill", temperature: 15)
                     WeatherDayView(dayOfWeek: "THU", imageName: "wind.snow", temperature: 5)
@@ -28,7 +28,22 @@ struct RootView: View {
                 Spacer()
                 
                 Button {
+                    let networkLayer = NetworkLayer(networkManager: NetworkManager())
+                    networkLayer.fetchWeather(city: "Moscow") { result in
+                        switch result {
+                        case .success(let model):
+                            let date = Date(timeIntervalSince1970: model.list[0].date)
+                            //let date = model.list[0].date
+                            let dateFormatter = DateFormatter()
+                            dateFormatter.dateFormat = "YYYY/MM/dd"
+                            
+                            print("\(dateFormatter.string(from: date))")
+                        case .failure(let error):
+                            print(error.description)
+                        }
+                    }
                     isNight.toggle()
+                    
                 } label: {
                     WeatherButton(title: "Change Day Time", textColor: .blue, backgroundColor: .white)
                 }
