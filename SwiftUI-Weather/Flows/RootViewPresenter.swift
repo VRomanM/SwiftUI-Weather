@@ -113,6 +113,6 @@ final class RootViewPresenter {
                 self.weatherDaysOfWeek = self.defaultWeatherForTest()
             }
         }
-        return defaultWeatherForTest()
+        return weatherDaysOfWeek
     }
 }
