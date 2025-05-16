@@ -17,12 +17,6 @@ struct ListResponse: Decodable {
     let temperature: TemperatureResponse
     let weather: [WeatherResponse]
     let dateStr: String
-    var dateDinamicStr: String {
-        let date = Date(timeIntervalSince1970: date)
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "YYYY/MM/dd"
-        return dateFormatter.string(from: date)
-    }
     
     enum CodingKeys: String, CodingKey {
         case date = "dt"
