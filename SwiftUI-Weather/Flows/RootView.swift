@@ -10,38 +10,30 @@ import SwiftUI
 struct RootView: View {
     
     @State private var isNight = false
+    @State var weatherDaysOfWeek: WeatherDaysOfWeek?
+    @State var rootViewPresenter: RootViewPresenter?
     
     var body: some View {
         ZStack {
             BackgroundView(isNight: $isNight)
             VStack {
-                CityTextView(cityName: "Cupertino, CA")
-                MainWeatherStatusView(imageName: isNight ? "moon.stars.fill" : "cloud.sun.fill",
-                                      temperature: 76)
-                HStack(spacing: 10) {
-                    WeatherDayView(dayOfWeek: "TUE", imageName: "cloud.sun.fill", temperature: 10)
-                    WeatherDayView(dayOfWeek: "WED", imageName: "sun.max.fill", temperature: 15)
-                    WeatherDayView(dayOfWeek: "THU", imageName: "wind.snow", temperature: 5)
-                    WeatherDayView(dayOfWeek: "FRI", imageName: "sunset.fill", temperature: 3)
-                    WeatherDayView(dayOfWeek: "SAT", imageName: "snow", temperature: 0)
+                if let weatherDaysOfWeek = weatherDaysOfWeek {
+                    CityTextView(cityName: weatherDaysOfWeek.city)
+                    MainWeatherStatusView(imageName: isNight ? weatherDaysOfWeek.daysOfWeekNight[0].imageName : weatherDaysOfWeek.daysOfWeek[0].imageName,
+                                          temperature: isNight ? weatherDaysOfWeek.daysOfWeekNight[0].temperature : weatherDaysOfWeek.daysOfWeek[0].temperature)
+                    HStack(spacing: 10) {
+                        ForEach(weatherDaysOfWeek.daysOfWeek.indices, id: \.self) { index in
+                            if index != 0 && index != 6 {
+                                WeatherDayView(dayOfWeek: weatherDaysOfWeek.daysOfWeek[index].day,
+                                               imageName: weatherDaysOfWeek.daysOfWeek[index].imageName,
+                                               temperature: weatherDaysOfWeek.daysOfWeek[index].temperature)
+                            }
+                        }
+                    }
                 }
                 Spacer()
                 
                 Button {
-                    let networkLayer = NetworkLayer(networkManager: NetworkManager())
-                    networkLayer.fetchWeather(city: "Moscow") { result in
-                        switch result {
-                        case .success(let model):
-                            let date = Date(timeIntervalSince1970: model.list[0].date)
-                            //let date = model.list[0].date
-                            let dateFormatter = DateFormatter()
-                            dateFormatter.dateFormat = "YYYY/MM/dd"
-                            
-                            print("\(dateFormatter.string(from: date))")
-                        case .failure(let error):
-                            print(error.description)
-                        }
-                    }
                     isNight.toggle()
                     
                 } label: {
@@ -49,6 +41,9 @@ struct RootView: View {
                 }
                 Spacer()
             }
+        }.onAppear() {
+            rootViewPresenter = RootViewPresenter()
+            weatherDaysOfWeek = rootViewPresenter?.fetchWeather(city: "Moscow")
         }
     }
 }
