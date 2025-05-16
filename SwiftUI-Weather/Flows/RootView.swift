@@ -10,27 +10,24 @@ import SwiftUI
 struct RootView: View {
     
     @State private var isNight = false
-    @State var weatherDaysOfWeek: WeatherDaysOfWeek?
-    @State var rootViewPresenter: RootViewPresenter?
+    @State var rootViewPresenter: RootViewPresenter
     
     var body: some View {
         ZStack {
             BackgroundView(isNight: $isNight)
             VStack {
-                if let weatherDaysOfWeek = weatherDaysOfWeek {
-                    CityTextView(cityName: weatherDaysOfWeek.city)
-                    MainWeatherStatusView(imageName: isNight ? weatherDaysOfWeek.daysOfWeekNight[0].imageName : weatherDaysOfWeek.daysOfWeek[0].imageName,
-                                          temperature: isNight ? weatherDaysOfWeek.daysOfWeekNight[0].temperature : weatherDaysOfWeek.daysOfWeek[0].temperature)
+                CityTextView(cityName: rootViewPresenter.weatherDaysOfWeek.city)
+                MainWeatherStatusView(imageName: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[0].imageName : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[0].imageName,
+                                      temperature: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[0].temperature : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[0].temperature)
                     HStack(spacing: 10) {
-                        ForEach(weatherDaysOfWeek.daysOfWeek.indices, id: \.self) { index in
+                        ForEach(rootViewPresenter.weatherDaysOfWeek.daysOfWeek.indices, id: \.self) { index in
                             if index != 0 && index != 6 {
-                                WeatherDayView(dayOfWeek: weatherDaysOfWeek.daysOfWeek[index].day,
-                                               imageName: weatherDaysOfWeek.daysOfWeek[index].imageName,
-                                               temperature: weatherDaysOfWeek.daysOfWeek[index].temperature)
+                                WeatherDayView(dayOfWeek: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[index].day : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[index].day,
+                                               imageName: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[index].imageName : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[index].imageName,
+                                               temperature: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[index].temperature : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[index].temperature)
                             }
                         }
                     }
-                }
                 Spacer()
                 
                 Button {
@@ -42,9 +39,13 @@ struct RootView: View {
                 Spacer()
             }
         }.onAppear() {
-            rootViewPresenter = RootViewPresenter()
-            weatherDaysOfWeek = rootViewPresenter?.fetchWeather(city: "Moscow")
+            rootViewPresenter.fetchWeather(city: "Moscow")
         }
+    }
+    
+    init(isNight: Bool = false) {
+        self.isNight = isNight
+        self.rootViewPresenter = RootViewPresenter()
     }
 }
 
