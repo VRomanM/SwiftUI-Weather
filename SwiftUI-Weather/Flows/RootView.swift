@@ -9,16 +9,22 @@ import SwiftUI
 
 struct RootView: View {
     
+    //MARK: - Private properties
+    
     @State private var isNight = false
-    @State var rootViewPresenter: RootViewPresenter
+    @State private var rootViewPresenter: RootViewPresenter
+    @State private var isLoading = false
+    
+    //MARK: - View
     
     var body: some View {
         ZStack {
             BackgroundView(isNight: $isNight)
             VStack {
-                CityTextView(cityName: rootViewPresenter.weatherDaysOfWeek.city)
-                MainWeatherStatusView(imageName: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[0].imageName : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[0].imageName,
-                                      temperature: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[0].temperature : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[0].temperature)
+                if isLoading == false {
+                    CityTextView(cityName: rootViewPresenter.weatherDaysOfWeek.city)
+                    MainWeatherStatusView(imageName: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[0].imageName : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[0].imageName,
+                                          temperature: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[0].temperature : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[0].temperature)
                     HStack(spacing: 10) {
                         ForEach(rootViewPresenter.weatherDaysOfWeek.daysOfWeek.indices, id: \.self) { index in
                             if index != 0 && index != 6 {
@@ -28,6 +34,7 @@ struct RootView: View {
                             }
                         }
                     }
+                }
                 Spacer()
                 
                 Button {
@@ -39,9 +46,16 @@ struct RootView: View {
                 Spacer()
             }
         }.onAppear() {
-            rootViewPresenter.fetchWeather(city: "Moscow")
+            isLoading = true
+            rootViewPresenter.fetchWeather(city: "Moscow") { result in
+                DispatchQueue.main.async {
+                    self.isLoading = result
+                }
+            }
         }
     }
+    
+    //MARK: - Constructions
     
     init(isNight: Bool = false) {
         self.isNight = isNight

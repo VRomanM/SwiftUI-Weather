@@ -86,7 +86,7 @@ final class RootViewPresenter {
     
     //MARK: - Function
     
-    func fetchWeather(city: String) {
+    func fetchWeather(city: String, completion: @escaping (Bool) -> Void) {
         networkLayer.fetchWeather(city: city) { result in
             switch result {
             case .success(let model):
@@ -95,6 +95,7 @@ final class RootViewPresenter {
                 print(error.description)
                 self.weatherDaysOfWeek = self.networkLayer.defaultWeatherForTest()
             }
+            completion(false)
         }
     }
 }
