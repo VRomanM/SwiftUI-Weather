@@ -20,41 +20,17 @@ struct RootView: View {
     var body: some View {
         ZStack {
             BackgroundView(isNight: $isNight)
-            VStack {
-                if isLoading == false {
-                    CityTextView(cityName: rootViewPresenter.weatherDaysOfWeek.city)
-                    MainWeatherStatusView(imageName: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[0].imageName : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[0].imageName,
-                                          temperature: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[0].temperature : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[0].temperature)
-                    HStack(spacing: 10) {
-                        ForEach(rootViewPresenter.weatherDaysOfWeek.daysOfWeek.indices, id: \.self) { index in
-                            if index != 0 && index != 6 {
-                                WeatherDayView(dayOfWeek: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[index].day : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[index].day,
-                                               imageName: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[index].imageName : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[index].imageName,
-                                               temperature: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[index].temperature : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[index].temperature)
-                            }
+//            TabView {
+//                ForEach(0..<4, id: \.self) { index in
+                    WeatherView(isNight: $isNight, isLoading: $isLoading, rootViewPresenter: rootViewPresenter)
+                        .tabItem {
+                            Text("Moscow")
                         }
-                    }
-                }
-                Spacer()
-                
-                Button {
-                    isNight.toggle()
-                    
-                } label: {
-                    WeatherButton(title: "Change Day Time", textColor: .blue, backgroundColor: .white)
-                }
-                Spacer()
-            }
-        }.onAppear() {
-            isLoading = true
-            rootViewPresenter.fetchWeather(city: "Moscow") { result in
-                DispatchQueue.main.async {
-                    self.isLoading = result
-                }
-            }
+                        .tag(0)
+//                }
+//            }
         }
     }
-    
     //MARK: - Constructions
     
     init(isNight: Bool = false) {
@@ -132,5 +108,47 @@ struct MainWeatherStatusView: View {
             
         }
         .padding(.bottom, 40)
+    }
+}
+
+struct WeatherView: View {
+    @Binding var isNight: Bool
+    @Binding var isLoading: Bool
+    var rootViewPresenter: RootViewPresenter
+    
+    var body: some View {
+        VStack {
+            if isLoading == false {
+                CityTextView(cityName: rootViewPresenter.weatherDaysOfWeek.city)
+                MainWeatherStatusView(imageName: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[0].imageName : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[0].imageName,
+                                      temperature: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[0].temperature : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[0].temperature)
+                HStack(spacing: 10) {
+                    ForEach(rootViewPresenter.weatherDaysOfWeek.daysOfWeek.indices, id: \.self) { index in
+                        if index != 0 && index != 6 {
+                            WeatherDayView(dayOfWeek: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[index].day : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[index].day,
+                                           imageName: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[index].imageName : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[index].imageName,
+                                           temperature: isNight ? rootViewPresenter.weatherDaysOfWeek.daysOfWeekNight[index].temperature : rootViewPresenter.weatherDaysOfWeek.daysOfWeek[index].temperature)
+                        }
+                    }
+                }
+            }
+            Spacer()
+            
+            Button {
+                isNight.toggle()
+                
+            } label: {
+                WeatherButton(title: "Change Day Time", textColor: .blue, backgroundColor: .white)
+            }
+            Spacer()
+        }.onAppear() {
+            isLoading = true
+            rootViewPresenter.fetchWeather(city: "Moscow") { result in
+                DispatchQueue.main.async {
+                    self.isLoading = result
+                }
+            }
+       // }
+        }
     }
 }
