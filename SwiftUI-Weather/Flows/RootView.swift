@@ -21,7 +21,7 @@ struct RootView: View {
         TabView {
             ForEach(0..<4, id: \.self) { index in
                 ZStack {
-                    BackgroundView(isNight: $isNight)
+                    BackgroundView(isNight: isNight)
                     WeatherView(city: rootViewPresenter.cities[index], isNight: $isNight, isLoading: $isLoading, rootViewPresenter: rootViewPresenter)
                 }
                 .tabItem {
@@ -57,7 +57,8 @@ struct WeatherDayView: View {
                 .foregroundColor(.white)
                 .padding()
             Image(systemName: imageName)
-                .renderingMode(.original)
+//                .renderingMode(.original)
+                .symbolRenderingMode(.multicolor)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 40, height: 40)
@@ -71,14 +72,15 @@ struct WeatherDayView: View {
 
 struct BackgroundView: View {
     
-    @Binding var isNight: Bool
+    var isNight: Bool
     
     var body: some View {
         
         LinearGradient(gradient: Gradient(colors: [isNight ? .black : .blue, isNight ? .gray : .lightBlue]),
                        startPoint: .topLeading,
                        endPoint: .bottomTrailing)
-        .edgesIgnoringSafeArea(.all)
+        //.edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
     }
 }
 
@@ -99,7 +101,8 @@ struct MainWeatherStatusView: View {
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: imageName)
-                .renderingMode(.original)
+//                .renderingMode(.original)
+                .symbolRenderingMode(.multicolor)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 180, height: 180)
