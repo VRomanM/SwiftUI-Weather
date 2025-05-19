@@ -18,19 +18,20 @@ struct RootView: View {
     //MARK: - View
     
     var body: some View {
-        ZStack {
-            BackgroundView(isNight: $isNight)
-//            TabView {
-//                ForEach(0..<4, id: \.self) { index in
-                    WeatherView(isNight: $isNight, isLoading: $isLoading, rootViewPresenter: rootViewPresenter)
-                        .tabItem {
-                            Text("Moscow")
-                        }
-                        .tag(0)
-//                }
-//            }
+        TabView {
+            ForEach(0..<4, id: \.self) { index in
+                ZStack {
+                    BackgroundView(isNight: $isNight)
+                    WeatherView(city: rootViewPresenter.cities[index], isNight: $isNight, isLoading: $isLoading, rootViewPresenter: rootViewPresenter)
+                }
+                .tabItem {
+                    Text("\(rootViewPresenter.cities[index])")
+                }
+                .tag(index)
+            }
         }
     }
+    
     //MARK: - Constructions
     
     init(isNight: Bool = false) {
@@ -112,6 +113,7 @@ struct MainWeatherStatusView: View {
 }
 
 struct WeatherView: View {
+    var city: String
     @Binding var isNight: Bool
     @Binding var isLoading: Bool
     var rootViewPresenter: RootViewPresenter
@@ -143,12 +145,11 @@ struct WeatherView: View {
             Spacer()
         }.onAppear() {
             isLoading = true
-            rootViewPresenter.fetchWeather(city: "Moscow") { result in
+            rootViewPresenter.fetchWeather(city: city) { result in
                 DispatchQueue.main.async {
                     self.isLoading = result
                 }
             }
-       // }
         }
     }
 }

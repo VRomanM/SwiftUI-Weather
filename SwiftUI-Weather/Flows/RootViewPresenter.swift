@@ -23,6 +23,7 @@ enum ImageWeather: String {
     case sun = "Sun"
     case clouds = "Clouds"
     case rain = "Rain"
+    case clear = "Clear"
     
     var image: String {
         switch self {
@@ -32,13 +33,19 @@ enum ImageWeather: String {
             return "cloud.fill"
         case .rain:
             return "cloud.rain.fill"
+        case .clear:
+            return "sun.horizon.fill"
         }
     }
 }
 
+
 final class RootViewPresenter {
     
+    //MARK: - Properties
+    
     var weatherDaysOfWeek: WeatherDaysOfWeek
+    let cities = ["Moscow", "Saint Petersburg", "Kazan", "Omsk"]
     
     //MARK: - Private properties
     
